@@ -11,12 +11,12 @@ import { BoxTokenStorageService } from '../utils/BoxLocalStorage';
 import { OAuthConfig, BoxOAuth, BoxClient } from 'box-typescript-sdk-gen';
 import { environment } from '../environment/environment';
 
-
 interface AuthContextType {
     isAuthenticated: boolean;
     accessToken: () => Promise<string | null>;
     client: BoxClient;
     lastError: string | null;
+    expriresIn: number | null;
     login: () => Promise<void>;
     logout: () => void;
 };
@@ -30,6 +30,7 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [accessToken, setAccessToken] = useState<string | null>(null);
+    const [expiresIn, setExpiresIn] = useState<number | null>(null);
     const [lastError, setLastError] = useState<string | null>(null);
     const [client, setClient] = useState<BoxClient | null>(null);
 
@@ -42,11 +43,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const boxOAuth = new BoxOAuth({config: oauthConfig});
 
     useEffect(() => {
+        const init = async () => {
+            const token = await tokenStorage.tokenPresent();
+            if (token) {
+                // Previously logged in.  Refresh if necessary and set the props
+            }
+            else {
+                // Not logged in.  Run the login flow
+                await runLoginFlow();
+            }
+        };
+        init();
     }, []);
 
     const getToken = useCallback(async (): Promise<string| null> => {
+        // If the token is expired, refresh it
+
+        // return the token
         return Promise.resolve("test");
     }, []);
+
+    const runLoginFlow = async () => {
+    }
 
     const login = useCallback(async () => {
         return Promise.resolve();
@@ -55,6 +73,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const logout = useCallback(async () => {
         setIsAuthenticated(false);  
         setAccessToken(null);
+        setExpiresIn(null);
+        setLastError("Loggedf Out");
         setClient(null);
         tokenStorage.clear(); 
     }, []);
@@ -64,6 +84,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         accessToken: getToken,
         client: client!,
         lastError,
+        expriresIn: expiresIn,
         login,
         logout
     }), [isAuthenticated, getToken, client, lastError, login, logout]);
