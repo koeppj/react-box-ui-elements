@@ -64,10 +64,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }, []);
 
     const runLoginFlow = async () => {
+        const authUrl = boxOAuth.getAuthorizeUrl({redirectUri: `${window.location.origin}/auth`});
+        const width = 600;
+        const height = 700;
+        const left = window.screenX + (window.innerWidth - width) / 2;
+        const top = window.screenY + (window.innerHeight - height) / 2;
+
+        const popup = window.open(authUrl, 'boxauth', `width=${width},height=${height},left=${left},top=${top}`);
+
+        if (!popup) {
+            setLastError('Popup blocked');
+            return Promise.resolve();
+        }
+  
+        return Promise.resolve();
     }
 
     const login = useCallback(async () => {
-        return Promise.resolve();
+        return runLoginFlow();
     }, []);
 
     const logout = useCallback(async () => {
