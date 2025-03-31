@@ -10,13 +10,16 @@ import React, {
 import { BoxTokenStorageService } from '../utils/BoxLocalStorage';
 import { OAuthConfig, BoxOAuth, BoxClient } from 'box-typescript-sdk-gen';
 import { environment } from '../environment/environment';
+import { useSnackbar } from 'notistack';
+import { AccessToken } from 'box-typescript-sdk-gen/lib/schemas/accessToken.generated';
+
 
 interface AuthContextType {
     isAuthenticated: boolean;
-    accessToken: () => Promise<string | null>;
+    accessToken: () => Promise<string | undefined>;
     client: BoxClient;
     lastError: string | null;
-    expriresIn: number | null;
+    expriresIn: number | undefined;
     login: () => Promise<void>;
     logout: () => void;
 };
@@ -28,9 +31,9 @@ interface AuthProviderProps {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+    const { enqueueSnackbar } = useSnackbar();
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [accessToken, setAccessToken] = useState<string | null>(null);
-    const [expiresIn, setExpiresIn] = useState<number | null>(null);
+    const [expiresAt, setexpiresAt] = useState<number | undefined>(undefined);
     const [lastError, setLastError] = useState<string | null>(null);
     const [client, setClient] = useState<BoxClient | null>(null);
 
@@ -44,26 +47,54 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     useEffect(() => {
         const init = async () => {
-            const token = await tokenStorage.tokenPresent();
+            const token = await tokenStorage.get();
             if (token) {
-                // Previously logged in.  Refresh if necessary and set the props
-            }
-            else {
-                // Not logged in.  Run the login flow
-                await runLoginFlow();
+                try {
+                    console.debug('AuthContext: Token found in storage, refreshing token...');
+                    await boxOAuth.refreshToken();
+                    const newToken = await tokenStorage.get();
+                    setClient(new BoxClient({ auth: boxOAuth }));
+                    setIsAuthenticated(true);
+                    setexpiresAt(Date.now() + (token.expiresIn ?? 0) * 1000);
+                }
+                catch (error) {
+                    console.error('Error refreshing token', error);
+                    setLastError("Error refreshing token");
+                    enqueueSnackbar("Error refreshing token", { variant: 'error' });
+                }
             }
         };
         init();
     }, []);
 
-    const getToken = useCallback(async (): Promise<string| null> => {
-        // If the token is expired, refresh it
-
-        // return the token
-        return Promise.resolve("test");
+    const getToken = useCallback(async (): Promise<string| undefined> => {
+        if (expiresAt && Date.now() > expiresAt) {
+            const token = await boxOAuth.refreshToken();
+            if (token) {
+                setexpiresAt(Date.now() + (token.expiresIn ?? 0) * 1000);
+                return Promise.resolve(token.accessToken);
+            } else {
+                enqueueSnackbar("Token not found", { variant: 'error' });
+                return Promise.reject("Token not found");
+            }
+        }
+        else if (expiresAt) {
+            const token = await boxOAuth.tokenStorage.get();
+            if (token) {
+                return Promise.resolve(token.accessToken);
+            } else {
+                enqueueSnackbar("Token not found", { variant: 'error' });
+                return Promise.reject("Token not found");
+            }
+        }
+        else {
+            enqueueSnackbar("Not Logged In", { variant: 'error' });
+            return Promise.reject("Not Logged In");
+        }
     }, []);
 
     const runLoginFlow = async () => {
+        console.debug('AuthContext: Running login flow');
         const authUrl = boxOAuth.getAuthorizeUrl({redirectUri: `${window.location.origin}/auth`});
         const width = 600;
         const height = 700;
@@ -76,8 +107,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             setLastError('Popup blocked');
             return Promise.resolve();
         }
-  
-        return Promise.resolve();
+
+        const interval = async (event: MessageEvent) => {
+            console.debug(`AuthContext: Message received from ${event.origin}`);
+            if (event.origin !== window.location.origin) {
+                return Promise.resolve();
+            }
+            const { type, code } = event.data;
+            if (type === 'oauth-code') {
+                window.removeEventListener('message', interval);
+                try {
+                    await boxOAuth.getTokensAuthorizationCodeGrant(code);
+                    setClient(new BoxClient({ auth: boxOAuth }));
+                    setIsAuthenticated(true);
+                    return Promise.resolve();
+                } catch (error: any) {
+                    console.error(error);
+                    setLastError(error.message);
+                    return Promise.reject(error);
+                }
+           }
+        };
+        window.addEventListener('message', interval);
     }
 
     const login = useCallback(async () => {
@@ -86,8 +137,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     const logout = useCallback(async () => {
         setIsAuthenticated(false);  
-        setAccessToken(null);
-        setExpiresIn(null);
+        setexpiresAt(undefined);
         setLastError("Loggedf Out");
         setClient(null);
         tokenStorage.clear(); 
@@ -98,14 +148,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         accessToken: getToken,
         client: client!,
         lastError,
-        expriresIn: expiresIn,
+        expriresIn: expiresAt,
         login,
         logout
     }), [isAuthenticated, getToken, client, lastError, login, logout]);
         
-    return (<div></div>);
-    // return (
-};
+    return (
+        <AuthContext.Provider value={contextValue}>
+          {children}
+        </AuthContext.Provider>
+    );
+}
 
 export const useAuth = (): AuthContextType => {
     const context = useContext(AuthContext);
