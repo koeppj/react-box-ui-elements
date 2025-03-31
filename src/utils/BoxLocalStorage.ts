@@ -5,7 +5,10 @@ import { environment } from "../environment/environment";
 export class BoxTokenStorageService  implements TokenStorage {
 
     store(token: AccessToken): Promise<undefined> {
+      const keyName = environment.BoxTokenStorageKeyName;
+      const keyNameForExpiresAt = `${keyName}_expiresAt`;
       localStorage.setItem(environment.BoxTokenStorageKeyName,JSON.stringify(token));
+      localStorage.setItem(keyNameForExpiresAt, (Date.now() + (token.expiresIn ?? 0) * 1000).toString());
       return Promise.resolve(undefined);
     }
     get(): Promise<undefined | AccessToken> {
@@ -28,6 +31,17 @@ export class BoxTokenStorageService  implements TokenStorage {
   
     storageKeyName(): string {
       return environment.BoxTokenStorageKeyName
+    }
+
+    getExpiresAt(): number | undefined {
+      const keyNameForExpiresAt = `${environment.BoxTokenStorageKeyName}_expiresAt`;
+      const expiresAtStr = localStorage.getItem(keyNameForExpiresAt);
+      if (expiresAtStr) {
+        return parseInt(expiresAtStr);
+      }
+      else {
+        return undefined;
+      }
     }
   
   }

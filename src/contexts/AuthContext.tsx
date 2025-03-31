@@ -50,12 +50,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             const token = await tokenStorage.get();
             if (token) {
                 try {
-                    console.debug('AuthContext: Token found in storage, refreshing token...');
-                    await boxOAuth.refreshToken();
-                    const newToken = await tokenStorage.get();
                     setClient(new BoxClient({ auth: boxOAuth }));
                     setIsAuthenticated(true);
-                    setexpiresAt(Date.now() + (token.expiresIn ?? 0) * 1000);
+                    setexpiresAt(tokenStorage.getExpiresAt());
                 }
                 catch (error) {
                     console.error('Error refreshing token', error);
@@ -68,17 +65,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }, []);
 
     const getToken = useCallback(async (): Promise<string| undefined> => {
-        if (expiresAt && Date.now() > expiresAt) {
+        const lastExpiresAt = tokenStorage.getExpiresAt();
+        if (lastExpiresAt && Date.now() > lastExpiresAt) {
             const token = await boxOAuth.refreshToken();
             if (token) {
-                setexpiresAt(Date.now() + (token.expiresIn ?? 0) * 1000);
+                setexpiresAt(tokenStorage.getExpiresAt());
                 return Promise.resolve(token.accessToken);
             } else {
                 enqueueSnackbar("Token not found", { variant: 'error' });
                 return Promise.reject("Token not found");
             }
         }
-        else if (expiresAt) {
+        else if (lastExpiresAt) {
             const token = await boxOAuth.tokenStorage.get();
             if (token) {
                 return Promise.resolve(token.accessToken);
