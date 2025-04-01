@@ -22,6 +22,7 @@ export class BoxTokenStorageService  implements TokenStorage {
     }
     clear(): Promise<undefined> {
       localStorage.removeItem(environment.BoxTokenStorageKeyName);
+      localStorage.removeItem(`${environment.BoxTokenStorageKeyName}_expiresAt`);
       return Promise.resolve(undefined);
     }
   

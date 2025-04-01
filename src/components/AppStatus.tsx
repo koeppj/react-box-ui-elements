@@ -2,6 +2,7 @@ import { Typography, Alert, Card, Grid2, List, ListItem, ListItemIcon, Checkbox,
 import { useAuth } from "../contexts/AuthContext";
 import { useEffect, useState } from "react";
 import { useSnackbar } from "notistack";
+import { contractTemplateSrc, documentTemplateSrc } from "../config/templates";
 
 export default function AppStatus() {
 
@@ -10,8 +11,8 @@ export default function AppStatus() {
 
   const [ contractTemplatePresent, setContractTemplatePresent ] = useState(false);
   const [ contractTemplateHidden, setContractTemplateHidden ] = useState(false);
-  const [ documentPresent, setDocumentPresent ] = useState(false);
-  const [ documentHidden, setDocumentHidden ] = useState(false);
+  const [ documentTemplatePresent, setDocumentTemplatePresent ] = useState(false);
+  const [ documentTemplateHidden, setDocumentTemplateHidden ] = useState(false);
   const [ userName , setUserName ] = useState<string | undefined>(undefined);
 
   useEffect(() => {
@@ -25,12 +26,12 @@ export default function AppStatus() {
           const templates = await client.metadataTemplates.getEnterpriseMetadataTemplates();
 
           // look for the contract and document template and set the state accordingly
-          const contractTemplate = templates.entries?.find(template => template.templateKey === 'contract');
-          const documentTemplate = templates.entries?.find(template => template.templateKey === 'contractDocument');
+          const contractTemplate = templates.entries?.find(template => template.templateKey === contractTemplateSrc?.templateKey);
+          const documentTemplate = templates.entries?.find(template => template.templateKey === documentTemplateSrc?.templateKey);
           setContractTemplatePresent(!!contractTemplate);
           setContractTemplateHidden(!!contractTemplate?.hidden);
-          setDocumentPresent(!!documentTemplate);
-          setDocumentHidden(!!documentTemplate?.hidden);
+          setDocumentTemplatePresent(!!documentTemplate);
+          setDocumentTemplateHidden(!!documentTemplate?.hidden);
 
           // Get the current user name
           const user = await client.users.getUserMe();
@@ -42,19 +43,20 @@ export default function AppStatus() {
       }
       else {
         setContractTemplatePresent(false);
-        setDocumentPresent(false);
+        setDocumentTemplatePresent(false);
       }
     };
     checkStatus();
   }, [isAuthenticated]);
 
 
-  const togglecontractTemplateHidden = async () => {
+  const toggleContractTemplateHidden = async () => {
     setContractTemplateHidden(!contractTemplateHidden);
   }
 
 
   const toggleDocumentTemplateHidden = async () => {
+    setDocumentTemplateHidden(!documentTemplateHidden);
   }
 
 
@@ -68,16 +70,16 @@ export default function AppStatus() {
         </Card>
       )}
       {isAuthenticated && (
-        <Card>
+        <Card sx={{ my: 2, padding: 2}}>
           <Typography variant="h5" component="h2" gutterBottom>App Status</Typography>
-          <Typography variant="body1" gutterBottom>The app is currently login in as {userName}.</Typography>
+          <Typography variant="body1" gutterBottom>The app is currently login in as {userName}. To forget login <Link component="button" onClick={logout}>Logout</Link></Typography>
           <div>
              <Typography>Current Acccess Token will exprise in {Math.floor(((expriresIn ?? 0)-Date.now())/1000/60)} minutes and {(expriresIn ?? 0) % 60} seconds</Typography>
           </div>
         </Card>
       )}
       {isAuthenticated && (
-        <Card>
+        <Card sx={{ my: 2, padding: 2}}>
           <Typography variant="h5" component="h2" gutterBottom>Template Status</Typography>
           <Typography variant="body1" gutterBottom>Templates are used to create documents and contracts.</Typography>
           <Grid2 container spacing={2}>
@@ -90,12 +92,13 @@ export default function AppStatus() {
                       checked={contractTemplatePresent}
                       tabIndex={-1}
                       disableRipple
+                      readOnly={true}
                     />
                   </ListItemIcon>
                   {contractTemplatePresent && (
                     <ListItemText>
-                      The Contract Metadata Template has been installed.  
-                      This meatadata template contains properties that describe a specific contract and are applied to folders.  
+                      The Contract metadata template has been installed.  
+                      This metadata template contains properties that describe a specific contract and are applied to folders.  
                       Contract Folders contain a list of Contract Files.
                       {contractTemplateHidden && (
                         <Typography component={"span"}>
@@ -111,7 +114,45 @@ export default function AppStatus() {
                     <Switch
                     edge="end"
                     checked={contractTemplateHidden}
-                    onChange={togglecontractTemplateHidden}
+                    onChange={toggleContractTemplateHidden}
+                    />
+                  )}
+                </ListItem>
+                <ListItem>
+                  <ListItemIcon>
+                    <Checkbox
+                      edge="start"
+                      checked={documentTemplatePresent}
+                      tabIndex={-1}
+                      disableRipple
+                      readOnly={true}
+                    />
+                  </ListItemIcon>
+                  {documentTemplatePresent && (
+                    <ListItemText>
+                      The Documennt Contract metadata yemplate has been installed.  
+                      This metadata template contains properties that describe files associated with a contract.  
+                      {documentTemplateHidden && (
+                        <Typography component={"span"}>
+                          This template is currently <em>hidden</em>, which means it will <em>not be visable</em> in the Box Web UI.  Use the Toggle to change that.
+                        </Typography>)}
+                      {!documentTemplateHidden && (
+                        <Typography component={"span"}>
+                          This template is currently <em>not hidden</em>, which means <em>it will be visable</em> in the Box Web UI.  Use the Toggle to change that.
+                        </Typography>)}
+                      </ListItemText>
+                    )}
+                  {!documentTemplatePresent && (
+                    <ListItemText>
+                      The Document metadata template is not installed.  This metadata template contains properties that describe files associated with a contract.  
+                      To install this template, please contact your Box administrator.
+                    </ListItemText>
+                    )}
+                  {documentTemplatePresent && (
+                    <Switch
+                    edge="end"
+                    checked={documentTemplateHidden}
+                    onChange={toggleDocumentTemplateHidden}
                     />
                   )}
                 </ListItem>
