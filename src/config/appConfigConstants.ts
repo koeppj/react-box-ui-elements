@@ -95,3 +95,5 @@ export const documentTemplateSrc = {
       }
     ]
 };
+
+export const rootFolderName = "Contracts";

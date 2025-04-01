@@ -1,18 +1,15 @@
-import { Typography, Alert, Card, Grid2, List, ListItem, ListItemIcon, Checkbox, ListItemText, Switch, FormControlLabel, Link } from "@mui/material";
+import { Typography, Alert, Card, Grid2, List, ListItem, ListItemIcon, Checkbox, ListItemText, Switch, Link } from "@mui/material";
 import { useAuth } from "../contexts/AuthContext";
 import { useEffect, useState } from "react";
 import { useSnackbar } from "notistack";
-import { contractTemplateSrc, documentTemplateSrc } from "../config/templates";
+import { useConfig } from "../contexts/ConfigContext";
 
 export default function AppStatus() {
 
-  const { isAuthenticated, accessToken, client, lastError, expriresIn, login, logout } = useAuth();
+  const { isAuthenticated, accessToken, client, expriresIn, login, logout } = useAuth();
+  const { contractTemplatePresent, contractTemplateHidden, documentTemplateHidden, documentTemplatePresent,toggleContractTemplateHidden, toggleDocumentTemplateHidden } = useConfig();
   const { enqueueSnackbar } = useSnackbar();
 
-  const [ contractTemplatePresent, setContractTemplatePresent ] = useState(false);
-  const [ contractTemplateHidden, setContractTemplateHidden ] = useState(false);
-  const [ documentTemplatePresent, setDocumentTemplatePresent ] = useState(false);
-  const [ documentTemplateHidden, setDocumentTemplateHidden ] = useState(false);
   const [ userName , setUserName ] = useState<string | undefined>(undefined);
 
   useEffect(() => {
@@ -22,17 +19,6 @@ export default function AppStatus() {
           // Refresh the access token if required
           await accessToken();
 
-          // Get the templates for hte EID
-          const templates = await client.metadataTemplates.getEnterpriseMetadataTemplates();
-
-          // look for the contract and document template and set the state accordingly
-          const contractTemplate = templates.entries?.find(template => template.templateKey === contractTemplateSrc?.templateKey);
-          const documentTemplate = templates.entries?.find(template => template.templateKey === documentTemplateSrc?.templateKey);
-          setContractTemplatePresent(!!contractTemplate);
-          setContractTemplateHidden(!!contractTemplate?.hidden);
-          setDocumentTemplatePresent(!!documentTemplate);
-          setDocumentTemplateHidden(!!documentTemplate?.hidden);
-
           // Get the current user name
           const user = await client.users.getUserMe();
           setUserName(user.name);
@@ -41,24 +27,9 @@ export default function AppStatus() {
           enqueueSnackbar(`Error fetching data: ${error}`, { variant: 'error' });
         }
       }
-      else {
-        setContractTemplatePresent(false);
-        setDocumentTemplatePresent(false);
-      }
     };
     checkStatus();
   }, [isAuthenticated]);
-
-
-  const toggleContractTemplateHidden = async () => {
-    setContractTemplateHidden(!contractTemplateHidden);
-  }
-
-
-  const toggleDocumentTemplateHidden = async () => {
-    setDocumentTemplateHidden(!documentTemplateHidden);
-  }
-
 
   return (
     <div>

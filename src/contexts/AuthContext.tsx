@@ -11,8 +11,6 @@ import { BoxTokenStorageService } from '../utils/BoxLocalStorage';
 import { OAuthConfig, BoxOAuth, BoxClient } from 'box-typescript-sdk-gen';
 import { environment } from '../environment/environment';
 import { useSnackbar } from 'notistack';
-import { AccessToken } from 'box-typescript-sdk-gen/lib/schemas/accessToken.generated';
-
 
 interface AuthContextType {
     isAuthenticated: boolean;
@@ -133,7 +131,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return runLoginFlow();
     }, []);
 
-    const logout = useCallback(async () => {
+    const logout = useCallback(() => {
         setIsAuthenticated(false);  
         setexpiresAt(undefined);
         setLastError("Loggedf Out");
@@ -149,7 +147,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         expriresIn: expiresAt,
         login,
         logout
-    }), [isAuthenticated, getToken, client, lastError, login, logout]);
+    }), [isAuthenticated, getToken, client, lastError, expiresAt, login, logout]);
         
     return (
         <AuthContext.Provider value={contextValue}>
