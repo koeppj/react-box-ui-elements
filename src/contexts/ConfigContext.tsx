@@ -4,11 +4,6 @@ import { useAuth } from "./AuthContext";
 import { useSnackbar } from "notistack";
 import { contractTemplateSrc, documentTemplateSrc, rootFolderName } from "../config/appConfigConstants";
 import { useEffect, useState } from "react";
-import { SearchForContentQueryParams } from "box-typescript-sdk-gen/lib/managers/search.generated";
-import { FileFullOrFolderFullOrWebLink } from "box-typescript-sdk-gen/lib/schemas/fileFullOrFolderFullOrWebLink.generated";
-import { serializeFileOrFolderOrWebLink } from "box-typescript-sdk-gen/lib/schemas/fileOrFolderOrWebLink.generated";
-import { FolderFull } from "box-typescript-sdk-gen/lib/schemas/folderFull.generated";
-import { SearchResultsWithSharedLinks } from "box-typescript-sdk-gen/lib/schemas/searchResultsWithSharedLinks.generated";
 
 
 interface ConfigContextType {
@@ -61,15 +56,18 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
                     setDocumentTemplateHidden(!!documentTemplate?.hidden);
 
                     // Look for the app's root folder in "All Files".  Be sure to check for an object
-                    // of type "folder" with a name that is an exaxt match.
-                    const allFiles = await client.search.searchForContent({
-                        ancestorFolderIds: ['0'],
-                        type: "folder",
-                        contentTypes: ['name'],
-                        query: `"${rootFolderName}"`,
+                    // of type "folder" with a name that is an exaxt match.  In this example we will
+                    // assume a result set of 1000 items or less.  IRL we would want to use pagination 
+                    // <via usemarer and and market querparams> to handle the unlikely possibility of
+                    // more than 1000 items in the root folder.
+                    const rootFolder = await client.folders.getFolderItems("0", {
+                        queryParams: {
+                            limit: 1000,
+                            fields: ["id", "type", "name"]
+                        }
                     });
-                    const rootFolder = (allFiles as SearchResultsWithSharedLinks).entries?.[0]?.item?.id;
-                    setRootFolderId(rootFolder);
+                    const folder = rootFolder.entries?.find(item => ((item.name === rootFolderName) && (item.type==="folder")));
+                    setRootFolderId(folder?.id);
                 } catch (error) {
                     console.error("Error fetching templates and root folder: ", error);
                     enqueueSnackbar(`Error fetching data and root folder: ${error}`, { variant: 'error' });

@@ -5,15 +5,13 @@ import {
   Link
 } from "react-router-dom";
 import { AppBar, Toolbar, Typography, Box, CssBaseline, Drawer, List, ListItem, ListItemIcon, ListItemText, ListItemButton } from '@mui/material';
-import { Dashboard, Folder, Group, Assessment, AccountCircle } from '@mui/icons-material';
+import { Dashboard, Folder, AccountCircle } from '@mui/icons-material';
 import AppStatus from './AppStatus';
 import OAuthCallback from './OAuthCallback';
-import { useAuth } from "../contexts/AuthContext";
 import { useConfig } from "../contexts/ConfigContext";
 
 function AppMain() {
 
-  const authContext = useAuth();
   const ConfigContext = useConfig();
 
   const drawerWidth = 240;

@@ -1,4 +1,4 @@
-import { Typography, Alert, Card, Grid2, List, ListItem, ListItemIcon, Checkbox, ListItemText, Switch, Link } from "@mui/material";
+import { Typography, Alert, Card, List, ListItem, ListItemIcon, Checkbox, ListItemText, Switch, Link } from "@mui/material";
 import { useAuth } from "../contexts/AuthContext";
 import { useEffect, useState } from "react";
 import { useSnackbar } from "notistack";
