@@ -9,10 +9,12 @@ import { Dashboard, Folder, Group, Assessment, AccountCircle } from '@mui/icons-
 import AppStatus from './AppStatus';
 import OAuthCallback from './OAuthCallback';
 import { useAuth } from "../contexts/AuthContext";
+import { useConfig } from "../contexts/ConfigContext";
 
 function AppMain() {
 
   const authContext = useAuth();
+  const ConfigContext = useConfig();
 
   const drawerWidth = 240;
 
@@ -46,7 +48,7 @@ function AppMain() {
                 </ListItemButton>
               </ListItem>
               <ListItem component={Link} to="/projects">
-                <ListItemButton disabled={!authContext.isAuthenticated}>
+                <ListItemButton disabled={!ConfigContext.configValid}>
                   <ListItemIcon><Folder /></ListItemIcon>
                   <ListItemText primary="Contracts (UI Elements)" />
                 </ListItemButton>

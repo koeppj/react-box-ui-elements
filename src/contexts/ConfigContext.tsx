@@ -8,6 +8,7 @@ import { SearchForContentQueryParams } from "box-typescript-sdk-gen/lib/managers
 import { FileFullOrFolderFullOrWebLink } from "box-typescript-sdk-gen/lib/schemas/fileFullOrFolderFullOrWebLink.generated";
 import { serializeFileOrFolderOrWebLink } from "box-typescript-sdk-gen/lib/schemas/fileOrFolderOrWebLink.generated";
 import { FolderFull } from "box-typescript-sdk-gen/lib/schemas/folderFull.generated";
+import { SearchResultsWithSharedLinks } from "box-typescript-sdk-gen/lib/schemas/searchResultsWithSharedLinks.generated";
 
 
 interface ConfigContextType {
@@ -63,16 +64,15 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
                     // of type "folder" with a name that is an exaxt match.
                     const allFiles = await client.search.searchForContent({
                         ancestorFolderIds: ['0'],
-                        contentTypes: ['folder'],
+                        type: "folder",
+                        contentTypes: ['name'],
                         query: `"${rootFolderName}"`,
                     });
-                    const rootFolder = allFiles.entries?.find(folder => folder.type === "folder");
-                    if (rootFolder) {
-                        setRootFolderId((rootFolder as FolderFull).id)
-                    }
+                    const rootFolder = (allFiles as SearchResultsWithSharedLinks).entries?.[0]?.item?.id;
+                    setRootFolderId(rootFolder);
                 } catch (error) {
-                    console.error("Error fetching templates: ", error);
-                    enqueueSnackbar(`Error fetching data: ${error}`, { variant: 'error' });
+                    console.error("Error fetching templates and root folder: ", error);
+                    enqueueSnackbar(`Error fetching data and root folder: ${error}`, { variant: 'error' });
                 }
             }
         };
