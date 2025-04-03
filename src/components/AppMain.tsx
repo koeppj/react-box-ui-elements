@@ -9,10 +9,11 @@ import { Dashboard, Folder, AccountCircle } from '@mui/icons-material';
 import AppStatus from './AppStatus';
 import OAuthCallback from './OAuthCallback';
 import { useConfig } from "../contexts/ConfigContext";
+import { ContentExplorerDemo } from "./ContentExplorerDemo";
 
 function AppMain() {
 
-  const ConfigContext = useConfig();
+  const configContext = useConfig();
 
   const drawerWidth = 240;
 
@@ -45,23 +46,22 @@ function AppMain() {
                   <ListItemText primary="App Status" />
                 </ListItemButton>
               </ListItem>
-              <ListItem component={Link} to="/projects">
-                <ListItemButton disabled={!ConfigContext.configValid}>
+              <ListItem component={Link} to="/explorer">
+                <ListItemButton disabled={!configContext.configValid()}>
                   <ListItemIcon><Folder /></ListItemIcon>
                   <ListItemText primary="Contracts (UI Elements)" />
                 </ListItemButton>
-              </ListItem>
+                </ListItem>
             </List>
           </Box>
         </Drawer>
         <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
           <Toolbar />
           <Switch>
-            <Route path="/auth" component={OAuthCallback} />
-            <Route path="/">
-              <AppStatus />
-            </Route>
-``              </Switch>
+            <Route path="/auth"><OAuthCallback /></Route>
+            <Route path="/explorer"><ContentExplorerDemo /></Route>
+            <Route path="/"><AppStatus /></Route>
+``        </Switch>
         </Box>
       </Box>
     </Router>

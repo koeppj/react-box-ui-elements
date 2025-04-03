@@ -68,6 +68,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             const token = await boxOAuth.refreshToken();
             if (token) {
                 setexpiresAt(tokenStorage.getExpiresAt());
+                setIsAuthenticated(true);
                 return Promise.resolve(token.accessToken);
             } else {
                 enqueueSnackbar("Token not found", { variant: 'error' });

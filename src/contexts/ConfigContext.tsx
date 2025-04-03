@@ -29,7 +29,7 @@ const ConfigContext = createContext<ConfigContextType | null>(null);
 export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
 
     const { enqueueSnackbar } = useSnackbar();
-    const { isAuthenticated, client, accessToken } = useAuth();
+    const { isAuthenticated, client, accessToken, expriresIn } = useAuth();
 
     const [ contractTemplatePresent, setContractTemplatePresent ] = useState(false);
     const [ contractTemplateHidden, setContractTemplateHidden ] = useState(false);
@@ -75,7 +75,7 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
             }
         };
         checkStatus();
-    }, [isAuthenticated]);
+    }, [isAuthenticated,expriresIn]);
 
     const createRootFolder = useCallback(async () => {
         if (isAuthenticated && !rootFolderId) {
