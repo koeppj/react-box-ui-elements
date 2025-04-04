@@ -26,7 +26,7 @@
   'react-measure': '^2.3.0' - check
   'sanitize-html': '^2.14.0' - check
   '@box/cldr-data': '>=34.2.0' - check
-  '@box/item-icon': '^0.9.58' - check ()
+  '@box/item-icon': '^0.9.58' - TODO
   'form-serialize': '^0.7.2' - check
   'ilib-tree-node': '^1.2.0', - check
   'react-draggable': '^4.4.6'- check

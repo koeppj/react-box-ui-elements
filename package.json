@@ -5,7 +5,6 @@
   "dependencies": {
     "@box/blueprint-web": "^9.20.0",
     "@box/cldr-data": "^45.0.0",
-    "@box/item-icon": "^0.9.112",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@hapi/address": "^2.1.4",
