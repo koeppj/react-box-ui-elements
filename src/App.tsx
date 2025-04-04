@@ -1,3 +1,4 @@
+import React from 'react';
 import { AuthProvider } from './contexts/AuthContext';
 import { SnackbarProvider } from 'notistack';
 import logo from './logo.svg';

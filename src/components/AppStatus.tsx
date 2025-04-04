@@ -1,6 +1,6 @@
 import { Typography, Alert, Card, List, ListItem, ListItemIcon, Checkbox, ListItemText, Switch, Link } from "@mui/material";
 import { useAuth } from "../contexts/AuthContext";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSnackbar } from "notistack";
 import { useConfig } from "../contexts/ConfigContext";
 

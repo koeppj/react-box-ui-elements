@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Typography } from "@mui/material";
 import { useAuth } from "../contexts/AuthContext";
 import { useEffect } from "react";
-import { ContentExplorer } from 'box-ui-elements/es/elements/content-explorer';
 
 export function ContentExplorerDemo() {
 
@@ -26,7 +25,6 @@ export function ContentExplorerDemo() {
     return (
         <div>
             <Typography variant="h2">Welcome to the Box Content Explorer UI Widget</Typography>
-            <ContentExplorer rootFolderId="0" />
         </div>
     )
 }
