@@ -5,6 +5,7 @@ import logo from './logo.svg';
 import './App.css';
 import AppMain from './components/AppMain';
 import { ConfigProvider } from './contexts/ConfigContext';
+import { IntlProvider } from 'react-intl';
 
 function App() {
 
@@ -12,7 +13,9 @@ function App() {
     <SnackbarProvider maxSnack={3}>
       <AuthProvider>
         <ConfigProvider>
-          <AppMain />
+          <IntlProvider locale="en">
+            <AppMain />
+          </IntlProvider>
         </ConfigProvider>
       </AuthProvider>
     </SnackbarProvider>

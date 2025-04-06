@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Typography } from "@mui/material";
 import { useAuth } from "../contexts/AuthContext";
 import { useEffect } from "react";
+import ContentExplorer from "box-ui-elements/es/elements/content-explorer";
+
 
 export function ContentExplorerDemo() {
 
@@ -13,6 +15,7 @@ export function ContentExplorerDemo() {
             if (isAuthenticated) {
                 // Get the access token for the component
                 const token = await accessToken();
+                console.debug("token", token);
                 setToken(token)
             }
             else {
@@ -20,11 +23,17 @@ export function ContentExplorerDemo() {
             }
         };
         init();
-    },[isAuthenticated,expriresIn,accessToken])
+    },[isAuthenticated])
 
     return (
         <div>
             <Typography variant="h2">Welcome to the Box Content Explorer UI Widget</Typography>
+            {token && (
+                <ContentExplorer
+                    token={token}
+                    rootFolderId="0"
+                />
+            )}
         </div>
     )
 }
