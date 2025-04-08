@@ -5,7 +5,7 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import { useAuth } from "../contexts/AuthContext";
 import { useEffect } from "react";
 import ContentExplorer from "box-ui-elements/es/elements/content-explorer";
-import ContentPicker from "box-ui-elements/es/elements/content-picker";
+import ContentPicker from "box-ui-elements/es/elements/content-picker/ContentPicker";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 export function ContentExplorerDemo() {
@@ -36,6 +36,10 @@ export function ContentExplorerDemo() {
         }
     };
 
+    function onChooseFolder(items: any[]) {
+        console.debug("onChooseFolder", items);
+    }
+
     return (
         <Card sx={{ my: 2, padding: 2,flexGrow: 1, display: 'flex', flexDirection: 'column', height: '80vh'}} id="content-explorer-demo">
           <Typography variant="h5" component="h2" gutterBottom>App Status</Typography>
@@ -46,11 +50,17 @@ export function ContentExplorerDemo() {
                         <AccordionSummary expandIcon={<ExpandMoreIcon />} >
                             <Typography>Folder Picker</Typography>
                         </AccordionSummary>
-                        <AccordionDetails>
+                        <AccordionDetails id='folder-picker-details'>
                             <ContentPicker 
                                 token={token}
+                                canUpload={false}
                                 type="folder"
-                                canUpload={false} />
+                                onChoose={onChooseFolder}
+                                rootFolderId={rootFolderId}
+                                canCreateNewFolder={false}
+                                canSetShareAccess={false}
+                                maxSelectable={1}
+                                isHeaderLogoVisible={false} />
                         </AccordionDetails>
                     </Accordion>
                 </div>
