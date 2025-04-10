@@ -50,7 +50,7 @@ function AppMain() {
               <ListItem component={Link} to="/explorer">
                 <ListItemButton disabled={!configContext.configValid()}>
                   <ListItemIcon><Folder /></ListItemIcon>
-                  <ListItemText primary="Contracts (UI Elements)" />
+                  <ListItemText primary="Content Explorer" />
                 </ListItemButton>
                 </ListItem>
             </List>
