@@ -11,10 +11,13 @@ import AppStatus from './AppStatus';
 import OAuthCallback from './OAuthCallback';
 import { useConfig } from "../contexts/ConfigContext";
 import { ContentExplorerDemo } from "./ContentExplorerDemo";
+import { ContentPreviewDemo } from './ContentPreviewDemo';
+import { useAuth } from '../contexts/AuthContext';
 
 function AppMain() {
 
   const configContext = useConfig();
+  const AuthContext = useAuth();
 
   const drawerWidth = 240;
 
@@ -48,21 +51,28 @@ function AppMain() {
                 </ListItemButton>
               </ListItem>
               <ListItem component={Link} to="/explorer">
-                <ListItemButton disabled={!configContext.configValid()}>
+                <ListItemButton disabled={!AuthContext.isAuthenticated}>
                   <ListItemIcon><Folder /></ListItemIcon>
                   <ListItemText primary="Content Explorer" />
                 </ListItemButton>
-                </ListItem>
+              </ListItem>
+              <ListItem component={Link} to="/preview">
+                <ListItemButton disabled={!AuthContext.isAuthenticated}>
+                  <ListItemIcon><Folder /></ListItemIcon>
+                  <ListItemText primary="Content Preview" />
+                </ListItemButton>
+              </ListItem>
             </List>
           </Box>
         </Drawer>
-        <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+        <Box component="main" sx={{ flexGrow: 1, p: 3, width: 'calc(100% - 240px)' }}>
           <Toolbar />
           <Switch>
             <Route path="/auth"><OAuthCallback /></Route>
             <Route path="/explorer"><ContentExplorerDemo /></Route>
+            <Route path ="/preview"><ContentPreviewDemo /></Route>
             <Route path="/"><AppStatus /></Route>
-``        </Switch>
+          </Switch>
         </Box>
       </Box>
     </Router>

@@ -72,10 +72,10 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
                     console.error("Error fetching templates and root folder: ", error);
                     enqueueSnackbar(`Error fetching data and root folder: ${error}`, { variant: 'error' });
                 }
-            }
-        };
+            };
+        }
         checkStatus();
-    }, [isAuthenticated,expriresIn]);
+    }, [isAuthenticated]);
 
     const createRootFolder = useCallback(async () => {
         if (isAuthenticated && !rootFolderId) {

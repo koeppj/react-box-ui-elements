@@ -64,7 +64,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     const getToken = useCallback(async (): Promise<string| undefined> => {
         const lastExpiresAt = tokenStorage.getExpiresAt();
-        if (lastExpiresAt && Date.now() > lastExpiresAt) {
+        if (lastExpiresAt && (Date.now() > lastExpiresAt)) {
             const token = await boxOAuth.refreshToken().then((token) => {;
                 setexpiresAt(tokenStorage.getExpiresAt());
                 setIsAuthenticated(true);
@@ -73,7 +73,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 console.error('Error refreshing token', error);
                 setLastError("Error refreshing token");
                 enqueueSnackbar("Error refreshing token", { variant: 'error' });
-                return Promise.reject("error refreshing token");
+                return Promise.resolve(undefined);
             })
         }
         else if (lastExpiresAt) {
