@@ -2,7 +2,7 @@ import React, { ChangeEvent, useState } from 'react';
 import { Card, Typography, Button, FormControlLabel, Switch, FormControl, InputLabel, MenuItem, Select, Box } from "@mui/material";
 import { useAuth } from "../contexts/AuthContext";
 import { useEffect } from "react";
-import ContentPreviewComponent from "box-ui-elements/es/elements/content-preview";
+import ContentPreview from "box-ui-elements/es/elements/content-preview";
 import { ContentPickerPopup } from "box-ui-elements/es/elements/content-picker";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {pickerContent, pickerContentOverlay } from "./ContentExplorerDemo.module.css";
@@ -182,11 +182,26 @@ export function ContentPreviewDemo() {
                 </div>
             )}        
             {token && previewOpts.fileId && (
-                <ContentPreviewComponent 
+                <ContentPreview 
                     key={previewOpts} // Add a key to force rerender when options change
                     sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}
                     token={token}
-                    {...previewOpts}
+                    fileId={previewOpts.fileId}
+                    hasHeader={previewOpts.hasHeader}
+                    canDownload={previewOpts.canDownload}
+                    showAnnotations={previewOpts.showAnnotations}
+                    contentSidebarProps={{
+                        hasActivityFeed: previewOpts.contentSidebarProps?.hasActivityFeed,
+                        hasMetadata: previewOpts.contentSidebarProps?.hasMetadata,
+                        hasSkills: previewOpts.contentSidebarProps?.hasSkills,
+                        hasVersions: previewOpts.contentSidebarProps?.hasVersions,
+                        detailsSidebarProps: {
+                            hasProperties: true,
+                            hasAccessStats: true,
+                            hasVersions: true,
+                            hasNotices: true,
+                        }
+                    }}
                 />
             )}
         </Card>
