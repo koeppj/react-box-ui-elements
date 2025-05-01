@@ -6,11 +6,12 @@
       "dom.iterable",
       "esnext"
     ],
-    "allowJs": true,
+    "allowJs": false,
+    "checkJs": false,
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "strict": true,
+    "strict": false,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "module": "esnext",
@@ -18,14 +19,14 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx",
+    "jsx": "react",
     "typeRoots": [
       "./types",
       "./node_modules/@types"
     ],
     "baseUrl": ".",
     "paths": {
-      "*": ["types/*", "node_modules/*"]
+      "box-locale-data": ["node_modules/@box/cldr-data/locale-data/en-US"]
     }
   },
   "include": [

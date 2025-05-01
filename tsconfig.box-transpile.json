@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+      "target": "es5",
+      "module": "esnext",
+      "esModuleInterop": true,
+      "skipLibCheck": true,
+      "isolatedModules": false, // ✅ disable this to allow re-exporting types
+      "allowSyntheticDefaultImports": true
+    }
+  }
+  

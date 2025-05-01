@@ -1,6 +1,6 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const MiniCssExtractPlugin = require("mini-css-extract-plugin")
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const { IgnorePlugin } = require('webpack');
 
 module.exports = {
@@ -8,28 +8,43 @@ module.exports = {
         filename: 'bundle.js',
         path: path.resolve(__dirname, 'dist'),
         clean: true
-   },    
+    },
     resolve: {
         fullySpecified: false,
         extensions: ['.js', '.jsx', '.ts', '.tsx']
-    },    
+    },
     module: {
         rules: [
+            // ✅ Handle the Box .ts file using ts-loader
+            {
+                test: /\.ts$/,
+                include: path.resolve(__dirname, 'node_modules/@box/cldr-data'),
+                use: {
+                  loader: 'ts-loader',
+                  options: {
+                    allowTsInNodeModules: true,
+                    transpileOnly: true,
+                    configFile: path.resolve(__dirname, 'tsconfig.box-transpile.json') // ✅ use isolatedModules: false
+                  }
+                }
+            },
+            // ✅ Handle your source files with Babel
             {
                 test: /\.(ts|tsx|js|jsx)$/,
                 exclude: /node_modules/,
                 use: 'babel-loader'
             },
+
             {
                 test: /\.(png|jpg|gif|svg)$/,
                 type: 'asset/resource'
-            },            
+            },
             {
                 test: /\.m?js/,
                 resolve: {
-                  fullySpecified: false,
+                    fullySpecified: false,
                 },
-            },    
+            },
             {
                 test: /\.s?css$/,
                 use: [
@@ -40,7 +55,7 @@ module.exports = {
                         loader: 'sass-loader',
                         options: {
                             sassOptions: {
-                                quietDeps: true, // ✅ Suppresses @import deprecation warnings from node_modules
+                                quietDeps: true,
                                 includePaths: ['./node_modules'],
                             },
                         },
@@ -58,14 +73,20 @@ module.exports = {
             ignoreOrder: true,
         }),
         new IgnorePlugin({
-            resourceRegExp: /moment$/, // Moment is optionally included by Pikaday, but is not needed in our bundle
+            resourceRegExp: /moment$/,
         }),
     ],
+    ignoreWarnings: [
+        {
+          module: /@box\/cldr-data/,
+          message: /was not found in/
+        }
+      ],
     devServer: {
         static: './dist',
         hot: true,
         open: true,
         historyApiFallback: true,
         port: 3000
-    }    
+    }
 };
