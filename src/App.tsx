@@ -13,7 +13,7 @@ function App() {
     <SnackbarProvider maxSnack={3}>
       <AuthProvider>
         <ConfigProvider>
-          <IntlProvider locale="en" messages={messages}>
+          <IntlProvider locale="en-US" messages={messages}>
             <AppMain />
           </IntlProvider>
         </ConfigProvider>
