@@ -13,6 +13,7 @@ import { useConfig } from "../contexts/ConfigContext";
 import { ContentExplorerDemo } from "./ContentExplorerDemo";
 import { ContentPreviewDemo } from './ContentPreviewDemo';
 import { useAuth } from '../contexts/AuthContext';
+import { FolderEmbedDemo } from './FolderEmbedDemo';
 
 function AppMain() {
 
@@ -62,6 +63,12 @@ function AppMain() {
                   <ListItemText primary="Content Preview" />
                 </ListItemButton>
               </ListItem>
+              <ListItem component={Link} to="/embed">
+                <ListItemButton disabled={!AuthContext.isAuthenticated}>
+                  <ListItemIcon><Folder /></ListItemIcon>
+                  <ListItemText primary="Folder Embed" />
+                </ListItemButton>
+              </ListItem>
             </List>
           </Box>
         </Drawer>
@@ -71,6 +78,7 @@ function AppMain() {
             <Route path="/auth"><OAuthCallback /></Route>
             <Route path="/explorer"><ContentExplorerDemo /></Route>
             <Route path ="/preview"><ContentPreviewDemo /></Route>
+            <Route path="/embed"><FolderEmbedDemo /></Route>
             <Route path="/"><AppStatus /></Route>
           </Switch>
         </Box>
