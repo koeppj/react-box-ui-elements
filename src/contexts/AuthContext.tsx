@@ -18,6 +18,7 @@ interface AuthContextType {
     client: BoxClient;
     lastError: string | null;
     expriresIn: number | undefined;
+    eid: string | null;
     login: () => Promise<void>;
     logout: () => void;
 };
@@ -34,6 +35,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [expiresAt, setexpiresAt] = useState<number | undefined>(undefined);
     const [lastError, setLastError] = useState<string | null>(null);
     const [client, setClient] = useState<BoxClient | null>(null);
+    const [eid, setEid] = useState<string | null>(null);
 
     const tokenStorage = new BoxTokenStorageService();
     const oauthConfig: OAuthConfig = {
@@ -51,6 +53,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                     setClient(new BoxClient({ auth: boxOAuth }));
                     setIsAuthenticated(true);
                     setexpiresAt(tokenStorage.getExpiresAt());
+                    setEid(environment.BoxEnterpriseId);
                 }
                 catch (error) {
                     console.error('Error refreshing token', error);
@@ -68,6 +71,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             const token = await boxOAuth.refreshToken().then((token) => {;
                 setexpiresAt(tokenStorage.getExpiresAt());
                 setIsAuthenticated(true);
+                setEid(environment.BoxEnterpriseId);
                 return Promise.resolve(token.accessToken);
             }).catch((error) => {
                 console.error('Error refreshing token', error);
@@ -147,9 +151,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         client: client!,
         lastError,
         expriresIn: expiresAt,
+        eid: eid,
         login,
         logout
-    }), [isAuthenticated, getToken, client, lastError, expiresAt, login, logout]);
+    }), [isAuthenticated, getToken, client, lastError, expiresAt, eid, login, logout]);
         
     return (
         <AuthContext.Provider value={contextValue}>

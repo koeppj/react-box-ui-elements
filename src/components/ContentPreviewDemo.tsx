@@ -113,7 +113,7 @@ export function ContentPreviewDemo() {
                         canSetShareAccess={false}
                         maxSelectable= {1}
                         showSelectedButton={false}
-                        renderCustomActionButtons={pickerButtons}
+//                        renderCustomActionButtons={pickerButtons}
                         modal={{
                             buttonLabel:"Select File",
                             modalClassName: pickerContent,

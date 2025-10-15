@@ -3,6 +3,8 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 const { IgnorePlugin } = require('webpack');
 
+const CLDR_TS = path.resolve(__dirname, 'node_modules/@box/cldr-data');
+
 module.exports = {
     output: {
         filename: 'bundle.js',
@@ -15,6 +17,22 @@ module.exports = {
     },    
     module: {
         rules: [
+            {
+                test: /\.tsx?$/,
+                include: [CLDR_TS],
+                use: {
+                    loader: 'ts-loader',
+                    options: {
+                        transpileOnly: true,
+                        allowTsInNodeModules: true,
+                        compilerOptions: {
+                            // ensure type-only imports/exports are removed in emitted JS
+                            verbatimModuleSyntax: false,
+                            preserveValueImports: false
+                        }
+                    }
+                }
+            },            
             {
                 test: /\.(ts|tsx|js|jsx)$/,
                 exclude: /node_modules/,
@@ -66,6 +84,10 @@ module.exports = {
         hot: true,
         open: true,
         historyApiFallback: true,
-        port: 3000
+        port: 3000,
+        client: {
+          overlay: { errors: true, warnings: false }, // no warning overlay in the UI
+          logging: 'none',                             // stop client console spam
+        },
     }    
 };

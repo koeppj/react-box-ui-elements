@@ -1,6 +1,7 @@
 import React, { ChangeEvent, useState } from 'react';
 import { Card, Typography, Button, FormControlLabel, Switch, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import { useAuth } from "../contexts/AuthContext";
+import { useConfig } from '../contexts/ConfigContext';
 import { useEffect } from "react";
 import ContentExplorer from "box-ui-elements/es/elements/content-explorer";
 import { ContentPickerPopup } from "box-ui-elements/es/elements/content-picker";
@@ -25,11 +26,22 @@ interface explorerProps {
     rootFolderId?: string,
 };
 
-export function ContentExplorerDemo() {
+export function ContentExplorerMetadataDemo() {
 
     const {isAuthenticated, expriresIn, client, accessToken} = useAuth();
     const [token, setToken] = useState<string|undefined>(undefined);
     const [currentFolderId, setCurrentFolderId] = useState<string | undefined>("0");
+    const { metadataTemplate, metadataSource } = useConfig();
+    const fieldsToShow = {
+
+    };
+    const fieldsToReturn = [
+        "taskDueDate",
+        "taskStatus",
+    ];
+
+
+
     const [ explorerOpts, setExplorerOpts ] = useState<explorerProps>({
         canCreateNewFolder: false,
         canDelete: false,

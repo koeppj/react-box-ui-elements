@@ -12,6 +12,7 @@ import OAuthCallback from './OAuthCallback';
 import { useConfig } from "../contexts/ConfigContext";
 import { ContentExplorerDemo } from "./ContentExplorerDemo";
 import { ContentPreviewDemo } from './ContentPreviewDemo';
+import { ContentExplorerMetadataDemo } from './ContentExplorerMetadataDemo';
 import { useAuth } from '../contexts/AuthContext';
 
 function AppMain() {
@@ -62,6 +63,12 @@ function AppMain() {
                   <ListItemText primary="Content Preview" />
                 </ListItemButton>
               </ListItem>
+              <ListItem component={Link} to="/metadata">
+                <ListItemButton disabled={!AuthContext.isAuthenticated || !configContext.contractTemplatePresent}>
+                  <ListItemIcon><Folder /></ListItemIcon>
+                  <ListItemText primary="Content Explorer + Metadata" />
+                </ListItemButton>
+              </ListItem>
             </List>
           </Box>
         </Drawer>
@@ -71,6 +78,7 @@ function AppMain() {
             <Route path="/auth"><OAuthCallback /></Route>
             <Route path="/explorer"><ContentExplorerDemo /></Route>
             <Route path ="/preview"><ContentPreviewDemo /></Route>
+            <Route path ="/metadata"><ContentExplorerMetadataDemo /></Route>
             <Route path="/"><AppStatus /></Route>
           </Switch>
         </Box>

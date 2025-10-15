@@ -18,6 +18,8 @@ interface ConfigContextType {
     createContractTemplate: () => Promise<void>;
     createDocumentTemplate: () => Promise<void>;
     configValid: () => boolean;
+    metadataSource?: string;
+    metadataTemplate?: string;
 }
 
 interface ConfigProviderProps {
@@ -29,13 +31,15 @@ const ConfigContext = createContext<ConfigContextType | null>(null);
 export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
 
     const { enqueueSnackbar } = useSnackbar();
-    const { isAuthenticated, client, accessToken, expriresIn } = useAuth();
+    const { isAuthenticated, client, accessToken, expriresIn, eid } = useAuth();
 
     const [ contractTemplatePresent, setContractTemplatePresent ] = useState(false);
     const [ contractTemplateHidden, setContractTemplateHidden ] = useState(false);
     const [ documentTemplatePresent, setDocumentTemplatePresent ] = useState(false);
     const [ documentTemplateHidden, setDocumentTemplateHidden ] = useState(false);
     const [ rootFolderId, setRootFolderId ] = useState<string | undefined>(undefined);
+    const [ metadataSource, setMetadataSource ] = useState<string | undefined>(undefined); 
+    const [ metadataTemplate, setMetadataTemplate ] = useState<string | undefined>(undefined);
 
     useEffect(() => {
         const checkStatus = async () => {
@@ -54,6 +58,10 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
                     setContractTemplateHidden(!!contractTemplate?.hidden);
                     setDocumentTemplatePresent(!!documentTemplate);
                     setDocumentTemplateHidden(!!documentTemplate?.hidden);
+                    if (contractTemplate) {
+                        setMetadataSource(`enterprise_${eid}?.templateKey`);
+                        setMetadataTemplate(`metadata.enterprise_${eid}?.templateKey`);
+                    }
 
                     // Look for the app's root folder in "All Files".  Be sure to check for an object
                     // of type "folder" with a name that is an exaxt match.  In this example we will
@@ -170,7 +178,9 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
         toggleDocumentTemplateHidden,
         createContractTemplate,
         createDocumentTemplate,
-        configValid
+        configValid,
+        metadataSource,
+        metadataTemplate
     };
         
     return (
