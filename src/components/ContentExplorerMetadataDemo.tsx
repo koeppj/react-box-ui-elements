@@ -3,7 +3,7 @@ import { Card, Typography, Button, FormControlLabel, Switch, FormControl, InputL
 import { useAuth } from "../contexts/AuthContext";
 import { useConfig } from '../contexts/ConfigContext';
 import { useEffect } from "react";
-import ContentExplorer from "box-ui-elements/es/elements/content-explorer";
+import ContentExplorer from "box-ui-elements/es/elements/content-explorer/ContentExplorer";
 import { ContentPickerPopup } from "box-ui-elements/es/elements/content-picker";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {pickerContent, pickerContentOverlay } from "./ContentExplorerDemo.module.css";
@@ -11,19 +11,15 @@ import { BoxItem } from "box-ui-elements/es/common/types/core";
 import { Accordion } from "@mui/material";
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
+import { MetadataQuery } from 'box-ui-elements/es/elements/metadata-based-viewer/types';
+import { MetadataDisplayProps } from 'box-ui-elements/es/elements/metadata-based-viewer/MetadataDisplay';
 
 interface explorerProps {
-    canCreateNewFolder?: boolean,
-    canDelete?: boolean,
-    canDownload?: boolean,
-    canPreview?: boolean,
-    canRename?: boolean,
-    canSetShareAccess?: boolean,
-    canShare?: boolean,
-    canUpload?: boolean,
-    currentFolderId?: string,
-    defaultView?: string,
-    rootFolderId?: string,
+    title?: string;
+    metadataQuery?: MetadataQuery;
+    metadataViewProps?: MetadataDisplayProps
+    columns?: any[];
+    defaultView: "metadata";    
 };
 
 export function ContentExplorerMetadataDemo() {
@@ -43,16 +39,8 @@ export function ContentExplorerMetadataDemo() {
 
 
     const [ explorerOpts, setExplorerOpts ] = useState<explorerProps>({
-        canCreateNewFolder: false,
-        canDelete: false,
-        canDownload: false,
-        canPreview: false,
-        canRename: false,
-        canSetShareAccess: false,
-        canShare: false,
-        canUpload: false,
-        currentFolderId: "0",
-        defaultView: "files",    
+        title: "Content Explorer - Metadata View",
+        defaultView: "metadata",
     });
     const [isExpanded, setIsExpanded] = useState<string| false>(false);
 
@@ -89,7 +77,6 @@ export function ContentExplorerMetadataDemo() {
     function onChooseCurrentFolder(items: BoxItem[]) {
         setExplorerOpts({
             ...explorerOpts,
-            currentFolderId: items[0].id,
         })
         setCurrentFolderId(items[0].id);
     }
@@ -130,41 +117,6 @@ export function ContentExplorerMetadataDemo() {
                                     }}
                                     isHeaderLogoVisible={false} />
 
-                            </FormControl>
-                            <FormControlLabel 
-                                control={<Switch onChange={() => setExplorerOpts({...explorerOpts, canCreateNewFolder: !explorerOpts.canCreateNewFolder})} />}
-                                label="Can Create New Folder"/>
-                            <FormControlLabel
-                                control={<Switch onChange={() => setExplorerOpts({...explorerOpts, canUpload: !explorerOpts.canUpload})} />}
-                                label="Enable Upload" />
-                            <FormControlLabel
-                                control={<Switch onChange={() => setExplorerOpts({...explorerOpts, canRename: !explorerOpts.canRename})} />}
-                                label="Enable Rename" />
-                            <FormControlLabel
-                                control={<Switch onChange={() => setExplorerOpts({...explorerOpts, canDelete: !explorerOpts.canDelete})} />}
-                                label="Enable Delete" />
-                            <FormControlLabel
-                                control={<Switch onChange={() => setExplorerOpts({...explorerOpts, canDownload: !explorerOpts.canDownload})} />}
-                                label="Enable Download" />
-                            <FormControlLabel
-                                control={<Switch onChange={() => setExplorerOpts({...explorerOpts, canPreview: !explorerOpts.canPreview})} />}
-                                label="Enable Preview" />
-                            <FormControlLabel
-                                control={<Switch onChange={() => setExplorerOpts({...explorerOpts, canShare: !explorerOpts.canShare})} />}
-                                label="Enable Share" />
-                            <FormControlLabel
-                                control={<Switch onChange={() => setExplorerOpts({...explorerOpts, canSetShareAccess: !explorerOpts.canSetShareAccess})} />}
-                                label="Enable Set Share Access" />
-                            <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }} size='small'>
-                                <InputLabel id="default-view-label">Default View</InputLabel>
-                                <Select
-                                    label="Default View"
-                                    labelId="default-view-label"
-                                    value={explorerOpts.defaultView}
-                                    onChange={(e) => setExplorerOpts({...explorerOpts, defaultView: e.target.value})}>
-                                        <MenuItem value="files">Files</MenuItem>
-                                        <MenuItem value="recents">Recents</MenuItem>
-                                    </Select>
                             </FormControl>
                         </AccordionDetails>
                     </Accordion>
