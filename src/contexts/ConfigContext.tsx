@@ -1,4 +1,4 @@
-import React, { ReactNode, use, useCallback } from "react";
+import React, { ReactNode, useCallback } from "react";
 import { createContext, useContext } from "react";
 import { useAuth } from "./AuthContext";
 import { useSnackbar } from "notistack";
@@ -18,8 +18,8 @@ interface ConfigContextType {
     createContractTemplate: () => Promise<void>;
     createDocumentTemplate: () => Promise<void>;
     configValid: () => boolean;
-    metadataSource?: string;
-    metadataTemplate?: string;
+    contractMetadata?: string;
+    contractFields?: string;
 }
 
 interface ConfigProviderProps {
@@ -38,8 +38,8 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
     const [ documentTemplatePresent, setDocumentTemplatePresent ] = useState(false);
     const [ documentTemplateHidden, setDocumentTemplateHidden ] = useState(false);
     const [ rootFolderId, setRootFolderId ] = useState<string | undefined>(undefined);
-    const [ metadataSource, setMetadataSource ] = useState<string | undefined>(undefined); 
-    const [ metadataTemplate, setMetadataTemplate ] = useState<string | undefined>(undefined);
+    const [ contractMetadata, setContractMetadata ] = useState<string | undefined>(undefined); 
+    const [ contractFields, setContractFields ] = useState<string | undefined>(undefined);
 
     useEffect(() => {
         const checkStatus = async () => {
@@ -59,8 +59,8 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
                     setDocumentTemplatePresent(!!documentTemplate);
                     setDocumentTemplateHidden(!!documentTemplate?.hidden);
                     if (contractTemplate) {
-                        setMetadataSource(`enterprise_${eid}?.templateKey`);
-                        setMetadataTemplate(`metadata.enterprise_${eid}?.templateKey`);
+                        setContractMetadata(`enterprise_${eid}?.templateKey`);
+                        setContractFields(`metadata.enterprise_${eid}?.templateKey`);
                     }
 
                     // Look for the app's root folder in "All Files".  Be sure to check for an object
@@ -179,8 +179,8 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
         createContractTemplate,
         createDocumentTemplate,
         configValid,
-        metadataSource,
-        metadataTemplate
+        contractMetadata,
+        contractFields
     };
         
     return (

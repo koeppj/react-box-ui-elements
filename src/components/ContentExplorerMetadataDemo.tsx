@@ -11,13 +11,12 @@ import { BoxItem } from "box-ui-elements/es/common/types/core";
 import { Accordion } from "@mui/material";
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
-import { MetadataQuery } from 'box-ui-elements/es/elements/metadata-based-viewer/types';
-import { MetadataDisplayProps } from 'box-ui-elements/es/elements/metadata-based-viewer/MetadataDisplay';
+import { MetadataViewProps, Column, } from '@box/metadata-view';
 
 interface explorerProps {
     title?: string;
-    metadataQuery?: MetadataQuery;
-    metadataViewProps?: MetadataDisplayProps
+    metadataQuery?: any
+    metadataViewProps?: any
     columns?: any[];
     defaultView: "metadata";    
 };
@@ -27,16 +26,18 @@ export function ContentExplorerMetadataDemo() {
     const {isAuthenticated, expriresIn, client, accessToken} = useAuth();
     const [token, setToken] = useState<string|undefined>(undefined);
     const [currentFolderId, setCurrentFolderId] = useState<string | undefined>("0");
-    const { metadataTemplate, metadataSource } = useConfig();
-    const fieldsToShow = {
+    const { contractFields, contractMetadata } = useConfig();
 
+    const metadataQuery = {
+        templateKey: contractFields,
+        scope: contractMetadata,
+        filters: []
     };
-    const fieldsToReturn = [
-        "taskDueDate",
-        "taskStatus",
+
+    const columns: Column[] = [
+    {textValue: "External Party Name", id: `${contractMetadata}.externalPartyName`, type: "string", allowsSorting: true},
+        {textValue: "contractType", id: "Contract Type", type: "enum", allowsSorting: true},
     ];
-
-
 
     const [ explorerOpts, setExplorerOpts ] = useState<explorerProps>({
         title: "Content Explorer - Metadata View",
