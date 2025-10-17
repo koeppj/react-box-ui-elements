@@ -35,7 +35,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [expiresAt, setexpiresAt] = useState<number | undefined>(undefined);
     const [lastError, setLastError] = useState<string | null>(null);
     const [client, setClient] = useState<BoxClient | null>(null);
-    const [eid, setEid] = useState<string | null>(null);
+    const [eid, setEid] = useState<string | null>(environment.BoxEnterpriseId || null);
 
     const tokenStorage = new BoxTokenStorageService();
     const oauthConfig: OAuthConfig = {
@@ -83,6 +83,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         else if (lastExpiresAt) {
             const token = await boxOAuth.tokenStorage.get();
             if (token) {
+                setEid(environment.BoxEnterpriseId);
                 return Promise.resolve(token.accessToken);
             } else {
                 enqueueSnackbar("Token not found", { variant: 'error' });

@@ -15,9 +15,11 @@ import { MetadataViewProps, Column, } from '@box/metadata-view';
 
 interface explorerProps {
     title?: string;
+    canPreview?: boolean,
     metadataQuery?: any
-    metadataViewProps?: any
-    columns?: any[];
+    metadataViewProps?: any;
+    itemActions?: any[];
+    features?: any;
     defaultView: "metadata";    
 };
 
@@ -29,19 +31,47 @@ export function ContentExplorerMetadataDemo() {
     const { contractFields, contractMetadata } = useConfig();
 
     const metadataQuery = {
-        templateKey: contractFields,
-        scope: contractMetadata,
-        filters: []
+        from: `${contractMetadata}`,
+        ancestor_folder_id: currentFolderId || '0',
+        fields: [`${contractFields}.externalPartyName`, 
+                 `${contractFields}.contractType`,
+                 `${contractFields}.endDate`,
+                `${contractFields}.autoRenew`,
+                `${contractFields}.lawyer`,
+                `${contractFields}.riskLevel`
+        ],
+        query: "item.type = :type_arg",
+        query_params: {
+            type_arg: "file"
+        }
     };
 
     const columns: Column[] = [
-    {textValue: "External Party Name", id: `${contractMetadata}.externalPartyName`, type: "string", allowsSorting: true},
-        {textValue: "contractType", id: "Contract Type", type: "enum", allowsSorting: true},
+        {textValue: "External Party Name", id: `${contractFields}.externalPartyName`, type: "string", allowsSorting: true},
+        {textValue: "Contract Type", id: `${contractFields}.contractType`, type: "enum", allowsSorting: true},
+        {textValue: "End Date", id: `${contractFields}.endDate`, type: "date", allowsSorting: true},
+        {textValue: "Auto Renew", id: `${contractFields}.autoRenew`, type: "enum", allowsSorting: true},
+        {textValue: "Lawyer", id: `${contractFields}.lawyer`, type: "string", allowsSorting: true},   
+        {textValue: "Risk Level", id: `${contractFields}.riskLevel`, type: "enum", allowsSorting: true},  
     ];
 
     const [ explorerOpts, setExplorerOpts ] = useState<explorerProps>({
         title: "Content Explorer - Metadata View",
         defaultView: "metadata",
+        canPreview: true,
+        metadataQuery: metadataQuery,
+        features: {
+            contentExplorer: {
+                metadataViewV2: true
+            }
+        },
+        metadataViewProps: {
+            columns: columns,
+            isSelectionEnabled: true,
+            actionBarProps: {
+                isAllFiltersDisabled: true,
+            }
+        }
     });
     const [isExpanded, setIsExpanded] = useState<string| false>(false);
 

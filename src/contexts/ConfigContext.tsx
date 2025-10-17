@@ -59,8 +59,11 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
                     setDocumentTemplatePresent(!!documentTemplate);
                     setDocumentTemplateHidden(!!documentTemplate?.hidden);
                     if (contractTemplate) {
-                        setContractMetadata(`enterprise_${eid}?.templateKey`);
-                        setContractFields(`metadata.enterprise_${eid}?.templateKey`);
+                        setContractMetadata(`enterprise_${eid}.${contractTemplate.templateKey}`);
+                        setContractFields(`metadata.enterprise_${eid}.${contractTemplate.templateKey}`);
+                    }
+                    else {
+                        console.warn("Contract template not found");
                     }
 
                     // Look for the app's root folder in "All Files".  Be sure to check for an object
