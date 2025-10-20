@@ -4,6 +4,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { useConfig } from '../contexts/ConfigContext';
 import { useEffect } from "react";
 import ContentExplorer from "box-ui-elements/es/elements/content-explorer/ContentExplorer";
+import ContentPreview from "box-ui-elements/es/elements/content-preview";
 import { ContentPickerPopup } from "box-ui-elements/es/elements/content-picker";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {pickerContent, pickerContentOverlay } from "./ContentExplorerDemo.module.css";
@@ -31,10 +32,10 @@ export function ContentExplorerMetadataDemo() {
     const {isAuthenticated, expriresIn, client, accessToken} = useAuth();
     const [token, setToken] = useState<string|undefined>(undefined);
     const [currentFolderId, setCurrentFolderId] = useState<string | undefined>("0");
-    const { contractFields, contractMetadata } = useConfig();
-    const [ configLoaded, setConfigLoaded ] = useState<boolean>(false);
-    const [previewItem, setPreviewItem] = useState<boolean>(false);
-    const [ explorerOpts, setExplorerOpts ] = useState<explorerProps | undefined>(undefined);
+    const {contractFields, contractMetadata } = useConfig();
+    const [configLoaded, setConfigLoaded ] = useState<boolean>(false);
+    const [previewItem, setPreviewItem] = useState<string | undefined>(undefined);
+    const [explorerOpts, setExplorerOpts ] = useState<explorerProps | undefined>(undefined);
     const [isExpanded, setIsExpanded] = useState<string| false>(false);
 
     const parentRef = useRef<HTMLDivElement>(null)    
@@ -123,15 +124,15 @@ export function ContentExplorerMetadataDemo() {
     }
 
     function onPreview(item: any): void {
-        setPreviewItem(true);
+        setPreviewItem(item.id);
     }
 
     function onClosePreview(): void {
-        setPreviewItem(false);
+        setPreviewItem(undefined);
     }
 
     return (
-        <Card sx={{ my: 2, padding: 2,flexGrow: 1, display: 'flex', flexDirection: 'column', height: '80vh'}} id="content-explorer-demo">
+        <Card sx={{ my: 2, padding: 2,flexGrow: 1, display: 'flex', flexDirection: 'column', height: '90vh'}} id="content-explorer-demo">
           <Typography variant="h5" component="h2" gutterBottom>Basic Content Explorer</Typography>
             {token && (
                 <div>
@@ -184,7 +185,7 @@ export function ContentExplorerMetadataDemo() {
 
                 />
                 )}
-                {configLoaded && (
+                {configLoaded && previewItem && (
                 <Modal 
                     isOpen={previewItem}
                     parentSelector={() => parentRef.current!}
@@ -203,12 +204,29 @@ export function ContentExplorerMetadataDemo() {
                     }}                    
                     onRequestClose={() => onClosePreview()}
                 >
-                    <p>Preview Modal</p>
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
-                        <Button variant="contained" color="primary" onClick={onClosePreview} aria-label="Close preview">
-                            Close
-                        </Button>
-                    </div>
+                    <ContentPreview 
+                            key={previewItem} // Add a key to force rerender when options change
+                            sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}
+                            token={token}
+                            fileId={previewItem}
+                            autoFocus={true}
+                            hasHeader={true}
+                            canDownload={true}
+                            onClose={onClosePreview}
+                            showAnnotations={true}
+                            contentSidebarProps={{
+                                hasActivityFeed: true,
+                                hasMetadata: true,
+                                hasSkills: true,
+                                hasVersions: true,
+                                detailsSidebarProps: {
+                                    hasProperties: true,
+                                    hasAccessStats: true,
+                                    hasVersions: true,
+                                    hasNotices: true,
+                                }
+                            }}
+                        />
                 </Modal>
                 )}
             </div>
