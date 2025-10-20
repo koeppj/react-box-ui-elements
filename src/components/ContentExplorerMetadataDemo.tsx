@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Card, Typography, Button, FormControlLabel, Switch, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import { useAuth } from "../contexts/AuthContext";
 import { useConfig } from '../contexts/ConfigContext';
@@ -11,7 +11,10 @@ import { BoxItem } from "box-ui-elements/es/common/types/core";
 import { Accordion } from "@mui/material";
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
-import { MetadataViewProps, Column, } from '@box/metadata-view';
+import { MetadataViewProps, Column, MetadataView, } from '@box/metadata-view';
+import { Item } from '@box/types';
+import Modal from 'react-modal';
+import { modalContent, modalOverlay, modalPortal } from './ContentExplorerMetadataDemo.module.css';
 
 interface explorerProps {
     title?: string;
@@ -29,51 +32,12 @@ export function ContentExplorerMetadataDemo() {
     const [token, setToken] = useState<string|undefined>(undefined);
     const [currentFolderId, setCurrentFolderId] = useState<string | undefined>("0");
     const { contractFields, contractMetadata } = useConfig();
-
-    const metadataQuery = {
-        from: `${contractMetadata}`,
-        ancestor_folder_id: currentFolderId || '0',
-        fields: [`${contractFields}.externalPartyName`, 
-                 `${contractFields}.contractType`,
-                 `${contractFields}.endDate`,
-                `${contractFields}.autoRenew`,
-                `${contractFields}.lawyer`,
-                `${contractFields}.riskLevel`
-        ],
-        query: "item.type = :type_arg",
-        query_params: {
-            type_arg: "file"
-        }
-    };
-
-    const columns: Column[] = [
-        {textValue: "External Party Name", id: `${contractFields}.externalPartyName`, type: "string", allowsSorting: true},
-        {textValue: "Contract Type", id: `${contractFields}.contractType`, type: "enum", allowsSorting: true},
-        {textValue: "End Date", id: `${contractFields}.endDate`, type: "date", allowsSorting: true},
-        {textValue: "Auto Renew", id: `${contractFields}.autoRenew`, type: "enum", allowsSorting: true},
-        {textValue: "Lawyer", id: `${contractFields}.lawyer`, type: "string", allowsSorting: true},   
-        {textValue: "Risk Level", id: `${contractFields}.riskLevel`, type: "enum", allowsSorting: true},  
-    ];
-
-    const [ explorerOpts, setExplorerOpts ] = useState<explorerProps>({
-        title: "Content Explorer - Metadata View",
-        defaultView: "metadata",
-        canPreview: true,
-        metadataQuery: metadataQuery,
-        features: {
-            contentExplorer: {
-                metadataViewV2: true
-            }
-        },
-        metadataViewProps: {
-            columns: columns,
-            isSelectionEnabled: true,
-            actionBarProps: {
-                isAllFiltersDisabled: true,
-            }
-        }
-    });
+    const [ configLoaded, setConfigLoaded ] = useState<boolean>(false);
+    const [previewItem, setPreviewItem] = useState<boolean>(false);
+    const [ explorerOpts, setExplorerOpts ] = useState<explorerProps | undefined>(undefined);
     const [isExpanded, setIsExpanded] = useState<string| false>(false);
+
+    const parentRef = useRef<HTMLDivElement>(null)    
 
     useEffect(() => {
         const init = async () => {
@@ -81,34 +45,61 @@ export function ContentExplorerMetadataDemo() {
                 // Get the access token for the component
                 await accessToken().then((token) => {
                     setToken(token)
+                    const metadataQuery = {
+                        from: `${contractMetadata}`,
+                        ancestor_folder_id: currentFolderId || '0',
+                        fields: [`${contractFields}.externalPartyName`, 
+                                `${contractFields}.contractType`,
+                                `${contractFields}.endDate`,
+                                `${contractFields}.autoRenew`,
+                                `${contractFields}.lawyer`,
+                                `${contractFields}.riskLevel`
+                        ],
+                        query: "item.type = :type_arg",
+                        query_params: {
+                            type_arg: "file"
+                        }
+                    };
+                    const columns: Column[] = [
+                        {textValue: "", id: "item.name", type: "string", minWidth: 40, maxWidth: 40, allowsSorting: false},
+                        {textValue: "File Name", id: "name", type: "string", minWidth: 300, allowsSorting: true, cellRenderer: DummyRenderer},
+                        {textValue: "External Party Name", id: `${contractFields}.externalPartyName`, type: "string", allowsSorting: true},
+                        {textValue: "Contract Type", id: `${contractFields}.contractType`, type: "enum", allowsSorting: true},
+                        {textValue: "End Date", id: `${contractFields}.endDate`, type: "date", allowsSorting: true},
+                        {textValue: "Auto Renew", id: `${contractFields}.autoRenew`, type: "enum", allowsSorting: true},
+                        {textValue: "Lawyer", id: `${contractFields}.lawyer`, type: "string", allowsSorting: true},   
+                        {textValue: "Risk Level", id: `${contractFields}.riskLevel`, type: "enum", allowsSorting: true},  
+                    ];
+                    setExplorerOpts({
+                        title: "Contract Documents",
+                        defaultView: "metadata",
+                        canPreview: true,
+                        features: {
+                            contentExplorer: {
+                                metadataViewV2: true
+                            }
+                        },
+                        metadataQuery: metadataQuery,
+                        metadataViewProps: {
+                            columns: columns,
+                            isSelectionEnabled: true,
+                            actionBarProps: {
+                                isAllFiltersDisabled: true,
+                            }
+                        }
+                    });
+                    setConfigLoaded(true);
                 })
             }
             else {
                 setToken(undefined);
+                setConfigLoaded(false)
             }
         };
         init();
-    },[isAuthenticated])
-
-    function pickerButtons(options: {
-        currentFolderId: string,
-        currentFolderName: string,
-        onCancel: () => void,
-        onChoose: () => void,
-        selectedCount: number,
-        selectedItems: any[],
-    }): React.ReactNode {
-        return (
-            <div>
-                <Button onClick={options.onCancel}>Cancel</Button>
-                <Button disabled={options.selectedCount === 0} onClick={options.onChoose}>Choose</Button>
-            </div>
-        );}
+    },[isAuthenticated,setCurrentFolderId])
 
     function onChooseCurrentFolder(items: BoxItem[]) {
-        setExplorerOpts({
-            ...explorerOpts,
-        })
         setCurrentFolderId(items[0].id);
     }
 
@@ -117,6 +108,27 @@ export function ContentExplorerMetadataDemo() {
             setIsExpanded(isExpanded ? panelId : false);
         }
     };
+
+    function DummyRenderer(item: Item, column: Column): React.ReactNode {
+        console.log("DummayRenderer Item:", item);
+        return (
+            <Button
+                variant="text"
+                onClick={(e) => { e.stopPropagation(); onPreview(item); }}
+                sx={{ textTransform: 'none', padding: 0, minWidth: 0 }}
+            >
+                {item.name}
+            </Button>
+        );
+    }
+
+    function onPreview(item: any): void {
+        setPreviewItem(true);
+    }
+
+    function onClosePreview(): void {
+        setPreviewItem(false);
+    }
 
     return (
         <Card sx={{ my: 2, padding: 2,flexGrow: 1, display: 'flex', flexDirection: 'column', height: '80vh'}} id="content-explorer-demo">
@@ -140,7 +152,6 @@ export function ContentExplorerMetadataDemo() {
                                     canSetShareAccess={false}
                                     maxSelectable= {1}
                                     showSelectedButton={false}
-//                                    renderCustomActionButtons={pickerButtons}
                                     modal={{
                                         buttonLabel:"Set Current Folder",
                                         modalClassName: pickerContent,
@@ -153,16 +164,54 @@ export function ContentExplorerMetadataDemo() {
                     </Accordion>
                 </div>
             )}        
-            {token && (
-            <ContentExplorer 
-                key={explorerOpts} // Add a key to force rerender when rootFolderId changes
-                sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}
-                token={token}
-                logoUrl="box"
-                {...explorerOpts}
+            <div id="demo-explorer" 
+                ref={parentRef} 
+                style={{
+                    position: "relative",
+                    height: "100%",          // or 100%, with ancestors also sized
+                    overflow: "hidden",   // clip overlay to parent if needed
+                    display: "flex",
+                    flexDirection: "column",
+                }}
+            >
+                {configLoaded && (
+                <ContentExplorer 
+                    key={explorerOpts} // Add a key to force rerender when rootFolderId changes
+                    sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column'}}
+                    token={token}
+                    logoUrl="box"
+                    {...explorerOpts}
 
-            />
-            )}
+                />
+                )}
+                {configLoaded && (
+                <Modal 
+                    isOpen={previewItem}
+                    parentSelector={() => parentRef.current!}
+                    style={{
+                    // key: prevent page-wide coverage
+                    overlay: { position: "absolute", inset: 0, zIndex: 6000, background: "rgba(0,0,0,0.4)" },
+                    content: {
+                        position: "absolute",
+                        inset: 0,           // fills entire overlay area
+                        margin: 0,
+                        padding: 0,
+                        background: "white",
+                        border: "none",
+                        outline: "none",
+                        zIndex: 11,                    },
+                    }}                    
+                    onRequestClose={() => onClosePreview()}
+                >
+                    <p>Preview Modal</p>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
+                        <Button variant="contained" color="primary" onClick={onClosePreview} aria-label="Close preview">
+                            Close
+                        </Button>
+                    </div>
+                </Modal>
+                )}
+            </div>
         </Card>
     )
 }

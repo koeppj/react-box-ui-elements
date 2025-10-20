@@ -4,6 +4,7 @@ import { useAuth } from "./AuthContext";
 import { useSnackbar } from "notistack";
 import { contractTemplateSrc, documentTemplateSrc, rootFolderName } from "../config/appConfigConstants";
 import { useEffect, useState } from "react";
+import { environment} from "../environment/environment"
 
 
 interface ConfigContextType {
@@ -43,6 +44,8 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
 
     useEffect(() => {
         const checkStatus = async () => {
+            setContractMetadata(`enterprise_${environment.BoxEnterpriseId}.${contractTemplateSrc.templateKey}`);
+            setContractFields(`metadata.enterprise_${environment.BoxEnterpriseId}.${contractTemplateSrc.templateKey}`);
             if (isAuthenticated) {
                 try {
                     // Refresh the access token if required
@@ -58,13 +61,6 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
                     setContractTemplateHidden(!!contractTemplate?.hidden);
                     setDocumentTemplatePresent(!!documentTemplate);
                     setDocumentTemplateHidden(!!documentTemplate?.hidden);
-                    if (contractTemplate) {
-                        setContractMetadata(`enterprise_${eid}.${contractTemplate.templateKey}`);
-                        setContractFields(`metadata.enterprise_${eid}.${contractTemplate.templateKey}`);
-                    }
-                    else {
-                        console.warn("Contract template not found");
-                    }
 
                     // Look for the app's root folder in "All Files".  Be sure to check for an object
                     // of type "folder" with a name that is an exaxt match.  In this example we will

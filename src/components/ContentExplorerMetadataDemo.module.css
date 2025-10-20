@@ -1,0 +1,20 @@
+.modalOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 6000;
+}
+
+.modalContent {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  background: white;
+  z-index: 6000;
+}
+
+.modalPortal {
+  position: absolute;      /* removes from normal flow */
+  inset: 0;
+  pointer-events: none;    /* clicks disabled at wrapper level */
+}
