@@ -99,7 +99,7 @@ export function ContentPreviewDemo() {
     };
 
     return (
-        <Card sx={{ my: 2, padding: 2,flexGrow: 1, display: 'flex', flexDirection: 'column', height: '80vh'}} id="content-explorer-demo">
+        <Card sx={{ my: 2, padding: 2,flexGrow: 1, display: 'flex', flexDirection: 'column', height: '85vh'}} id="content-explorer-demo">
           <Typography variant="h5" component="h2" gutterBottom>Content Preview</Typography>
             {token && (
                 <div>
