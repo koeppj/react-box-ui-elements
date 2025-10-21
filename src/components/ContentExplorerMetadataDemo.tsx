@@ -16,6 +16,7 @@ import { MetadataViewProps, Column, MetadataView, } from '@box/metadata-view';
 import { Item } from '@box/types';
 import Modal from 'react-modal';
 import { modalContent, modalOverlay, modalPortal } from './ContentExplorerMetadataDemo.module.css';
+import { Console } from 'console';
 
 interface explorerProps {
     title?: string;
@@ -97,8 +98,9 @@ export function ContentExplorerMetadataDemo() {
                 setConfigLoaded(false)
             }
         };
+        console.log("ContentExplorerMetadataDemo: isAuthenticated=", isAuthenticated, " currentFolderId=", currentFolderId);
         init();
-    },[isAuthenticated,setCurrentFolderId])
+    },[isAuthenticated,currentFolderId])
 
     function onChooseCurrentFolder(items: BoxItem[]) {
         setCurrentFolderId(items[0].id);
@@ -111,7 +113,6 @@ export function ContentExplorerMetadataDemo() {
     };
 
     function DummyRenderer(item: Item, column: Column): React.ReactNode {
-        console.log("DummayRenderer Item:", item);
         return (
             <Button
                 variant="text"
