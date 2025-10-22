@@ -74,6 +74,7 @@ function AppMain() {
         </Drawer>
         <Box component="main" sx={{ flexGrow: 1, p: 3, width: 'calc(100% - 240px)' }}>
           <Toolbar />
+          <div id="modal-root"></div>
           <Switch>
             <Route path="/auth"><OAuthCallback /></Route>
             <Route path="/explorer"><ContentExplorerDemo /></Route>

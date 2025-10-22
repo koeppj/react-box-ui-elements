@@ -15,8 +15,7 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import { MetadataViewProps, Column, MetadataView, } from '@box/metadata-view';
 import { Item } from '@box/types';
 import Modal from 'react-modal';
-import { modalContent, modalOverlay, modalPortal } from './ContentExplorerMetadataDemo.module.css';
-import { Console } from 'console';
+import { useLocation } from 'react-router-dom';
 
 interface explorerProps {
     title?: string;
@@ -40,6 +39,7 @@ export function ContentExplorerMetadataDemo() {
     const [isExpanded, setIsExpanded] = useState<string| false>(false);
 
     const parentRef = useRef<HTMLDivElement>(null)    
+    const location = useLocation();
 
     useEffect(() => {
         const init = async () => {
@@ -98,7 +98,6 @@ export function ContentExplorerMetadataDemo() {
                 setConfigLoaded(false)
             }
         };
-        console.log("ContentExplorerMetadataDemo: isAuthenticated=", isAuthenticated, " currentFolderId=", currentFolderId);
         init();
     },[isAuthenticated,currentFolderId])
 
@@ -178,7 +177,7 @@ export function ContentExplorerMetadataDemo() {
             >
                 {configLoaded && (
                 <ContentExplorer 
-                    key={explorerOpts} // Add a key to force rerender when rootFolderId changes
+                    key={String(currentFolderId)} // Add a key to force rerender when rootFolderId changes
                     sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column'}}
                     token={token}
                     logoUrl="box"
@@ -188,8 +187,9 @@ export function ContentExplorerMetadataDemo() {
                 )}
                 {configLoaded && previewItem && (
                 <Modal 
-                    isOpen={previewItem}
-                    parentSelector={() => parentRef.current!}
+                    isOpen={!!previewItem}
+                    parentSelector={() => (parentRef.current ?? document.body)}
+                    appElement={document.getElementById('modal-root')!}
                     style={{
                     // key: prevent page-wide coverage
                     overlay: { position: "absolute", inset: 0, zIndex: 6000, background: "rgba(0,0,0,0.4)" },
